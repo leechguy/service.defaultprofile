@@ -1,0 +1,27 @@
+service.defaultprofile
+======================
+
+When using multiple profiles with the login screen disabled, XBMC will automatically login the user profile that was logged in during the last session.
+
+This add-on allows you to override this behaviour and set a specific default profile which will always be used during login. When XBMC quits this add-on will overwrite the <lastloaded> value in profiles.xml with the profile id of the configured default profile.
+Optionally, you can configure the add-on to either switch to the default profile or logout and show the login screen when XBMC has been idle for a configurable time.
+
+Please be aware that this is a workaround. When XBMC crashes then during the next startup of XBMC a profile other than the configured default profile may be visible for a short moment. The add-on then automatically logs out this other profile and logs in the configured default profile.
+If you use password protection on one or more of your profiles, then make sure that you lock the settings for all profiles using the Master Lock.
+
+
+Installation and Configuration:
+(instructions based on Confluence skin)
+
+    1. Download the zip (https://github.com/leechguy/service.defaultprofile/downloads).
+    2. If you are not logged in into XBMC using the Master user profile, then logout and login as Master user.
+    3. Go to Settings->Add-ons and choose 'Install from zip file'.
+    4. Lookup the downloaded zip file and press the 'OK'-button.
+    5. Restart XBMC.
+    6. Login using the Master user profile.
+    7. Go to Settings->Add-ons->Installed Add-ons (Eden) or Enabled Add-ons (Pre-Frodo) -> Services -> Load Default Profile Service
+    8. Press the 'Configure'-button.
+    9. Enter the default profile name you want to use when starting XBMC. Note that this field is case sensitive!
+   10. Restart XBMC. XBMC should now log in using the configured default profile.
+
+This add-on is compatible with XBMC Eden and pre-Frodo.

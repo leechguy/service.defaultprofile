@@ -1,3 +1,9 @@
+Version 0.2.0
+
+- Added option to automatically switch to default profile when idle (when not using login screen)
+- Added option to automatically logout when idle (when using login screen)
+  
+
 Version 0.1.0
 
 - Initial release.

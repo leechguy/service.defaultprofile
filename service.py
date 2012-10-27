@@ -1,6 +1,9 @@
 import os, time, xbmc, xbmcaddon
 import profilesxml, settingsxml
 
+CHECK_TIME_DISABLED = 1893477600 # unix timestamp for 1/1/2030
+SLEEP_TIME = 1000
+
 class DefaultProfile:
     addon_id = 'service.defaultprofile'
     Addon = xbmcaddon.Addon(addon_id)
@@ -8,13 +11,10 @@ class DefaultProfile:
     profiles = profilesxml.ProfilesXml(os.path.join(xbmc.translatePath('special://masterprofile'), 'profiles.xml'))
     settings = settingsxml.SettingsXml(os.path.join(xbmc.translatePath('special://masterprofile'), 'addon_data', addon_id, 'settings.xml'))
 
-    sleep_time = 1000
-
 
     def runService(self):
 
         self.log('Starting: ' + self.Addon.getAddonInfo('name') + ' v' + self.Addon.getAddonInfo('version'))
-
 
         # only allow configuration of the addon by the master user
         if self.isMasterProfile():
@@ -22,26 +22,52 @@ class DefaultProfile:
         else:
             self.Addon.setSetting('isMasterUser', 'false')
 
-        useLoginScreen = self.profiles.getUseLoginScreen().lower() == 'true'
+        use_login_screen = self.profiles.getUseLoginScreen().lower() == 'true'
+        default_profile = self.getDefaultProfile()
+        active_profile = xbmc.getInfoLabel('System.ProfileName')   
+
+        self.log('Default Profile: ' + default_profile)
+        self.log('Active Profile.: ' + active_profile)
 
         # don't waist cpu cycles when we don't use autologin 
-        if not useLoginScreen:
-            default_profile = self.getDefaultProfile()
-            active_profile = xbmc.getInfoLabel('System.ProfileName')   
-
-            self.log('Default Profile: ' + default_profile)
-            self.log('Active Profile.: ' + active_profile)
-
+        if not use_login_screen:
             # this can only happen when XBMC crashed
             if active_profile != default_profile and default_profile != "":
                 self.log('Changing profile to the default profile: ' + default_profile)
                 xbmc.executebuiltin("XBMC.LoadProfile(" + default_profile + ", prompt)")
-        
+
+        use_idle_timer = self.getUseIdleTimer()
+        max_idle_time = self.getMaxIdleTime() * 60
+        check_time = time.time()
         # run until XBMC quits
         while(not xbmc.abortRequested):
-            xbmc.sleep(self.sleep_time)
 
-        self.log('Waking up, preparing to exit')
+            if not use_idle_timer:
+                # skip all, go to sleep
+                pass
+            elif xbmc.Player().isPlaying():
+                # while playing media we reset the check_time to prevent that we're being
+                # logged out immediately after playing stops
+                check_time = time.time()
+            elif xbmc.getGlobalIdleTime() == 0:
+                # user activity so we reset the check_time to 'now'
+                check_time = time.time()
+            elif (time.time() - check_time) > max_idle_time and xbmc.getInfoLabel('System.ProfileName') != default_profile:
+                idle_time = time.time() - check_time
+                # set check_time to 1/1/2030 so we only swap profiles / perform logout once
+                # until the user comes back
+                check_time = CHECK_TIME_DISABLED
+                if use_login_screen:
+                    self.log("System idle for %d seconds; logging out." % idle_time)
+                    xbmc.executebuiltin('System.LogOff')
+                elif xbmc.getInfoLabel('System.ProfileName') != default_profile:
+                    self.log("System idle for %d seconds; switching to default profile" % idle_time)
+                    xbmc.executebuiltin("XBMC.LoadProfile(" + default_profile + ", prompt)")
+
+            if not xbmc.abortRequested:
+                xbmc.sleep(SLEEP_TIME)
+
+        self.log('Preparing to exit')
 
         default_profile = self.getDefaultProfile()
         active_profile = xbmc.getInfoLabel('System.ProfileName')
@@ -54,13 +80,26 @@ class DefaultProfile:
             self.log('Updated profiles.xml. Set lastloaded value to profile id of: ' + default_profile)
 
     def getDefaultProfile(self):
-        profile = ""
+        return self.getAddonSetting('defaultProfile')
+
+    def getUseIdleTimer(self):
+        return self.getAddonSetting('useIdleTimer')
+
+    def getMaxIdleTime(self):
+        max_idle_time = self.getAddonSetting('maxIdleTime').rstrip('0').rstrip('.')
+        if max_idle_time == "":
+            max_idle_time = "5"
+        return int(max_idle_time)
+
+
+    def getAddonSetting(self, setting):
+        value = ""
         try:
             self.settings.parse()
-            profile = self.settings.getSetting('defaultProfile')
+            value = self.settings.getSetting(setting)
         except Exception, err:
             self.log(str(err))
-        return profile
+        return value
 
     def isMasterProfile(self):
         return (xbmc.translatePath('special://masterprofile') == xbmc.translatePath('special://profile'))

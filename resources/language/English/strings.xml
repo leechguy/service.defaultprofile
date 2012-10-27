@@ -4,4 +4,7 @@
     <string id="30000">General</string>
     <string id="30001">Default profile name</string>
     <string id="30002">This addon must be configured using the Master user profile.</string>
+    <string id="30003">Restart XBMC for the changes to take affect.</string>
+    <string id="30004">Automatically switch to default profile / logoff when idle</string>
+    <string id="30005">Idle timeout (in minutes)</string>
 </strings>
