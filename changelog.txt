@@ -1,3 +1,8 @@
+Version 0.2.2
+
+- Fixed: Add-on version number
+
+
 Version 0.2.1
 
 - Fixed: Could not switch off option to automatically switch profile / logout on idle
