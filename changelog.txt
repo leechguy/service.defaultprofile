@@ -1,3 +1,8 @@
+Version 0.3.0
+
+- Added option to switch to default profile / logoff after resuming
+
+
 Version 0.2.2
 
 - Fixed: Add-on version number

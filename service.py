@@ -2,6 +2,7 @@ import os, time, xbmc, xbmcaddon
 import profilesxml, settingsxml
 
 CHECK_TIME_DISABLED = 1893477600 # unix timestamp for 1/1/2030
+RESUME_TIMEOUT = 5
 SLEEP_TIME = 1000
 
 class DefaultProfile:
@@ -38,7 +39,9 @@ class DefaultProfile:
 
         use_idle_timer = self.getUseIdleTimer() == 'true'
         max_idle_time = self.getMaxIdleTime() * 60
+        use_resume_watchdog = self.getUseResumeWatchdog() == 'true'
         check_time = time.time()
+        resume_watchdog_time = time.time()
         # run until XBMC quits
         while(not xbmc.abortRequested):
 
@@ -63,6 +66,16 @@ class DefaultProfile:
                 elif xbmc.getInfoLabel('System.ProfileName') != default_profile:
                     self.log("System idle for %d seconds; switching to default profile" % idle_time)
                     xbmc.executebuiltin("XBMC.LoadProfile(" + default_profile + ", prompt)")
+
+            if use_resume_watchdog:
+                if (time.time() - resume_watchdog_time) > RESUME_TIMEOUT and xbmc.getInfoLabel('System.ProfileName') != default_profile:
+                    if use_login_screen:
+                        self.log("System resuming after suspend; logging out.")
+                        xbmc.executebuiltin('System.LogOff')
+                    elif xbmc.getInfoLabel('System.ProfileName') != default_profile:
+                        self.log("System resuming after suspend; switching to default profile")
+                        xbmc.executebuiltin("XBMC.LoadProfile(" + default_profile + ", prompt)")
+                resume_watchdog_time = time.time()
 
             if not xbmc.abortRequested:
                 xbmc.sleep(SLEEP_TIME)
@@ -91,6 +104,8 @@ class DefaultProfile:
             max_idle_time = "5"
         return int(max_idle_time)
 
+    def getUseResumeWatchdog(self):
+        return self.getAddonSetting('useResumeWatchdog')
 
     def getAddonSetting(self, setting):
         value = ""

@@ -6,9 +6,11 @@
         <setting type="lsep" label="30002" visible="eq(-2,false)" />
         <setting type="sep" visible="eq(-3,true)" />
         <setting id="useIdleTimer" type="bool" label="30004" visible="eq(-4,true)" default="false" />
-        <setting id="maxIdleTime" type="slider" label="30005" visible="eq(-5,true)" range="1,60" default="5" option="int" subsetting="true" />
+        <setting id="maxIdleTime" type="slider" label="30005" enable="eq(-1,true)" visible="eq(-5,true)" range="1,60" default="5" option="int" subsetting="true" />
         <setting type="sep" visible="eq(-6,true)" />
-        <setting type="lsep" visible="eq(-7,true)" />
-        <setting type="lsep" label="30003" visible="eq(-8,true)" />
+        <setting id="useResumeWatchdog" type="bool" label="30006" visible="eq(-7,true)" default="false" />
+        <setting type="sep" visible="eq(-8,true)" />
+        <setting type="lsep" visible="eq(-9,true)" />
+        <setting type="lsep" label="30003" visible="eq(-10,true)" />
     </category>
 </settings>
