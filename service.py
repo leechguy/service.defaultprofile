@@ -36,7 +36,7 @@ class DefaultProfile:
                 self.log('Changing profile to the default profile: ' + default_profile)
                 xbmc.executebuiltin("XBMC.LoadProfile(" + default_profile + ", prompt)")
 
-        use_idle_timer = self.getUseIdleTimer()
+        use_idle_timer = self.getUseIdleTimer() == 'true'
         max_idle_time = self.getMaxIdleTime() * 60
         check_time = time.time()
         # run until XBMC quits

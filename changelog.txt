@@ -1,3 +1,8 @@
+Version 0.2.1
+
+- Fixed: Could not switch off option to automatically switch profile / logout on idle
+
+
 Version 0.2.0
 
 - Added option to automatically switch to default profile when idle (when not using login screen)
