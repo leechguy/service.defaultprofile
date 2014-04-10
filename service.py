@@ -65,6 +65,8 @@ class DefaultProfile:
                     xbmc.executebuiltin('System.LogOff')
                 elif xbmc.getInfoLabel('System.ProfileName') != default_profile:
                     self.log("System idle for %d seconds; switching to default profile" % idle_time)
+                    # Activate window to disable the screensaver
+                    xbmc.executebuiltin("XBMC.ActivateWindow(home)")
                     xbmc.executebuiltin("XBMC.LoadProfile(" + default_profile + ", prompt)")
 
             if use_resume_watchdog:
